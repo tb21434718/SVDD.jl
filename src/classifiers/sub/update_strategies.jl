@@ -12,10 +12,10 @@ struct FixedWeightStrategy <: WeightUpdateStrategy
     v_Lout::Float64
 end
 
-function update_v(v, label::Symbol, update_strategy::FixedWeightStrategy)
-    if label == :Lin
+function update_v(v, fb_label::Symbol, update_strategy::FixedWeightStrategy)
+    if fb_label == :Lin
         return update_strategy.v_Lin
-    elseif label == :Lout
+    elseif fb_label == :Lout
         return update_strategy.v_Lout
     else
         return v

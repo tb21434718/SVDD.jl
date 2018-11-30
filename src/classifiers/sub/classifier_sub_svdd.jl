@@ -61,12 +61,16 @@ function set_C!(model::SubSVDD, C::Real)
     return nothing
 end
 
-function update_weights!(model::SubSVDD, indices)
-    model.v[indices] .= update_v.(model.v[indices], labelmap2vec(model.pools)[indices], model.weight_update_strategy)
+function process_feedback!(model::SubSVDD, feedback::Dict{Int, Symbol})
+    model.weight_update_strategy === nothing && error("Cannot update $(typeof(model)) without update strategy.")
+    local pools = labelmap2vec(model.pools)
+    for (fb_idx, fb_label) in feedback
+        model.v[fb_idx] = SVDD.update_v(model.v[fb_idx], fb_label, model.weight_update_strategy)
+        pools[fb_idx] = fb_label
+    end
+    model.pools = labelmap(pools)
     return nothing
 end
-
-update_weights!(model::SubSVDD) = update_weights!(model, 1:size(model.data, 2))
 
 function fit!(model::SubSVDD, solver)
     debug(LOGGER, "[FIT] Fitting $(typeof(model)).")
