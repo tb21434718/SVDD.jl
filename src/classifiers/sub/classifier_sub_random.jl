@@ -38,3 +38,6 @@ function set_data!(model::SubRandomOCClassifier, data::Array{T, 2}) where T <: R
     model.data = data
     return nothing
 end
+
+update_with_feedback!(model::SubRandomOCClassifier, q_id::Int, q_label::Symbol) = nothing
+update_with_feedback!(model::SubRandomOCClassifier, q_object::Array{Float64, 2}, q_label::Symbol) = nothing

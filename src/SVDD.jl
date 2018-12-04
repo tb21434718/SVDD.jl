@@ -58,7 +58,7 @@ export
 
     initialize!,
     fit!,
-    process_feedback!,
+    update_with_feedback!,
     predict,
     classify,
 

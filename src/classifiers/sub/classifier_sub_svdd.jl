@@ -61,17 +61,6 @@ function set_C!(model::SubSVDD, C::Real)
     return nothing
 end
 
-function process_feedback!(model::SubSVDD, feedback::Dict{Int, Symbol})
-    model.weight_update_strategy === nothing && error("Cannot update $(typeof(model)) without update strategy.")
-    local pools = labelmap2vec(model.pools)
-    for (fb_idx, fb_label) in feedback
-        model.v[fb_idx] = SVDD.update_v(model.v[fb_idx], fb_label, model.weight_update_strategy)
-        pools[fb_idx] = fb_label
-    end
-    model.pools = labelmap(pools)
-    return nothing
-end
-
 function fit!(model::SubSVDD, solver)
     debug(LOGGER, "[FIT] Fitting $(typeof(model)).")
     model.state == model_created && throw(ModelStateException(model.state, model_initialized))
@@ -172,4 +161,10 @@ end
 function predict(model::SubSVDD, target::Array{<:Real,2})
     @assert size(model.data, 1) == size(target, 1)
     map(idx -> predict(model, target[model.subspaces[idx], :], idx), eachindex(model.subspaces))
+end
+
+function apply_update_strategy!(model::SubSVDD, q_id::Int, q_pool_label::Symbol)
+    model.weight_update_strategy === nothing && error("Cannot update $(typeof(model)) without update strategy.")
+    model.v[q_id] = SVDD.update_v(model.v[q_id], q_pool_label, model.weight_update_strategy)
+    return nothing
 end

@@ -99,3 +99,28 @@ function initialize!(model::OCClassifier, strategy::InitializationStrategy)
 end
 
 get_kernel(model::OCClassifier) = model.kernel_fct
+
+apply_update_strategy!(model, q_id, q_pool_label) = nothing
+
+function update_with_feedback!(model, query_ids::Vector{Int}, query_pool_labels::Vector{Symbol})
+    pools = labelmap2vec(model.pools)
+    for (q_id, q_label) in zip(query_ids, query_pool_labels)
+        pools[q_id] = q_label
+        apply_update_strategy!(model, q_id, q_label)
+    end
+    model.pools = labelmap(pools)
+    model.state = model_initialized
+    return nothing
+end
+
+function update_with_feedback!(model, query_objects::Array{Float64, 2}, query_pool_labels::Vector{Symbol})
+    pools = labelmap2vec(model.pools)
+    push!(pools, query_labels)
+    for (q_id, q_label) in zip(query_objects, query_pool_labels)
+        apply_update_strategy!(model, q_obj, q_label)
+    end
+    model.pools = labelmap(pools)
+    model.data = hcat(model.data, query_objects)
+    model.state = model_initialized
+    return nothing
+end

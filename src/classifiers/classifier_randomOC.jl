@@ -33,3 +33,6 @@ function set_data!(model::RandomOCClassifier, data::Array{T, 2}) where T <: Real
     model.data = data
     return nothing
 end
+
+update_with_feedback!(model::RandomOCClassifier, q_id::Int, q_label::Symbol) = nothing
+update_with_feedback!(model::RandomOCClassifier, q_object::Array{Float64, 2}, q_label::Symbol) = nothing

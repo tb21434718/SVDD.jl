@@ -82,26 +82,23 @@
         model.v .= 1.0
         expected_pools = labelmap2vec(model.pools)
 
-        feedback = Dict{Int, Symbol}()
         @assert model.weight_update_strategy === nothing
-        @test_throws ErrorException process_feedback!(model, feedback)
+        @test_throws ErrorException update_with_feedback!(model, [1], [:U])
 
         update_strategy = SVDD.FixedWeightStrategy(1.1, 0.9)
         set_param!(model, Dict(:weight_update_strategy => update_strategy))
         @test model.weight_update_strategy == update_strategy
 
-        process_feedback!(model, feedback)
+        update_with_feedback!(model, Int[], Symbol[])
         @test labelmap2vec(model.pools) == expected_pools
 
-        expected_pools[1:2] .= [:Lin, :Lout]
-        feedback = Dict(1=> :Lin, 2 => :Lout, 3 => :U)
-
-        process_feedback!(model, feedback)
+        query_ids = [1,2]
+        query_pool_labels = [:Lin, :Lout]
+        expected_pools[query_ids] .= query_pool_labels
+        update_with_feedback!(model, query_ids, query_pool_labels)
         @test model.v[1] ≈ 1.1
         @test model.v[2] ≈ 0.9
         @test all(model.v[3:end] .≈ 1.0)
         @test labelmap2vec(model.pools) == expected_pools
-
-        process_feedback!(model, Dict{Int, Symbol}())
     end
 end
