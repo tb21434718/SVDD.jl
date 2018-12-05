@@ -163,8 +163,19 @@ function predict(model::SubSVDD, target::Array{<:Real,2})
     map(idx -> predict(model, target[model.subspaces[idx], :], idx), eachindex(model.subspaces))
 end
 
-function apply_update_strategy!(model::SubSVDD, q_id::Int, q_pool_label::Symbol)
-    model.weight_update_strategy === nothing && error("Cannot update $(typeof(model)) without update strategy.")
-    model.v[q_id] = SVDD.update_v(model.v[q_id], q_pool_label, model.weight_update_strategy)
+function apply_update_strategy!(model::SubSVDD, new_pools::Vector{Symbol}, query_ids::Vector{Int},
+    old_idx_remaining::Vector{Int},
+    new_idx_remaining::Vector{Int})
+
+    model.weight_update_strategy === nothing && error("Cannot update $(typeof(model)) with update strategy 'nothing'.")
+    @assert length(old_idx_remaining) == length(new_idx_remaining)
+
+    old_v = copy(model.v[old_idx_remaining])
+    model.v = fill(get_default_v(model.weight_update_strategy), length(new_pools))
+    model.v[new_idx_remaining] .= old_v
+
+    for q_id in query_ids
+        model.v[q_id] = update_v(model.v[q_id], new_pools[q_id], model.weight_update_strategy)
+    end
     return nothing
 end

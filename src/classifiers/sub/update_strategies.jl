@@ -21,3 +21,5 @@ function update_v(v, fb_label::Symbol, update_strategy::FixedWeightStrategy)
         return v
     end
 end
+
+get_default_v(::FixedWeightStrategy) = one(Float64)

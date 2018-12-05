@@ -39,5 +39,6 @@ function set_data!(model::SubRandomOCClassifier, data::Array{T, 2}) where T <: R
     return nothing
 end
 
-update_with_feedback!(model::SubRandomOCClassifier, query_objects::Vector{Int}, query_pool_labels::Vector{Symbol}) = nothing
-update_with_feedback!(model::SubRandomOCClassifier, query_objects::Array{Float64, 2}, query_pool_labels::Vector{Symbol}) = nothing
+update_with_feedback!(model::SubRandomOCClassifier, new_data, new_pools::Vector{Symbol}, query_ids::Vector{Int},
+    old_idx_remaining::Vector{Int},
+    new_idx_remaining::Vector{Int}) = nothing
