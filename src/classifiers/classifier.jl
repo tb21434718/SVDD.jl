@@ -109,7 +109,7 @@ function update_with_feedback!(model, query_ids::Vector{Int}, query_pool_labels:
         apply_update_strategy!(model, q_id, q_label)
     end
     model.pools = labelmap(pools)
-    model.state = model_initialized
+    invalidate_solution!(model)
     return nothing
 end
 
@@ -120,7 +120,7 @@ function update_with_feedback!(model, query_objects::Array{Float64, 2}, query_po
         apply_update_strategy!(model, q_obj, q_label)
     end
     model.pools = labelmap(pools)
-    model.data = hcat(model.data, query_objects)
-    model.state = model_initialized
+    set_data!(model, hcat(model.data, query_objects))
+    invalidate_solution!(model)
     return nothing
 end
